@@ -258,11 +258,19 @@
             padding-top: 15px;
             border-top: 1px solid #ced4da;
         }
-        #avaliacaoMelhorias p {
+        #avaliacaoMelhorias p { /* Aplicado ao p#textoAvaliacao */
             white-space: pre-line;
             line-height: 1.7;
+            padding: 10px;
+            border-radius: 5px;
+            /* Cores de fundo e texto serão definidas via JS */
         }
-        /* Removido: #pontuacaoViabilidade */
+         #classificacaoViabilidade { /* Novo estilo para o título da classificação */
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            /* Cores serão definidas via JS */
+        }
 
 
         @media (max-width: 700px) {
@@ -385,7 +393,7 @@
             </div>
             <div id="avaliacaoMelhorias">
                 <h3>Avaliação e Sugestões de Melhorias:</h3>
-                <!-- Removido: div#pontuacaoViabilidade -->
+                <div id="classificacaoViabilidade">Classificação: -</div> <!-- Campo para classificação textual -->
                 <p id="textoAvaliacao">-</p>
             </div>
             <button type="button" id="exportarPDFBtn">Exportar Relatório para PDF</button>
@@ -412,6 +420,58 @@
             const resultadosSimulacaoDiv = document.getElementById('resultadosSimulacao');
             const exportarPDFBtn = document.getElementById('exportarPDFBtn');
             const faturamentoMensalInput = document.getElementById('faturamentoMensal');
+
+            const sugestoesDespesasEspecificas = {
+                "aluguel": "Se o aluguel representa uma parcela significativa das suas despesas, considere renegociar o contrato ou procurar um ponto comercial com custo mais baixo, se a localização atual não for absolutamente crucial para o faturamento.",
+                "energia": "Analise o consumo de energia. Pequenas mudanças de hábitos, troca por equipamentos mais eficientes ou a consideração de energia solar a longo prazo podem reduzir este custo.",
+                "marketing": "Avalie o retorno sobre o investimento (ROI) das suas atuais campanhas de marketing. Concentre-se nas estratégias que trazem mais resultado ou explore canais de marketing de baixo custo, como parcerias locais ou marketing de conteúdo.",
+                "matéria-prima": "Pesquise novos fornecedores, negocie descontos por volume ou explore alternativas de matéria-prima mais econômicas sem comprometer a qualidade do seu produto final.",
+                "insumos": "Pesquise novos fornecedores, negocie descontos por volume ou explore alternativas de insumos mais econômicos sem comprometer a qualidade.",
+                "fornecedores": "Revise seus contratos com fornecedores. Busque orçamentos competitivos e explore a possibilidade de negociação para melhores condições de preço e prazo.",
+                "pessoal": "Analise a produtividade da equipe e a estrutura de cargos. Considere otimizar processos para reduzir a necessidade de horas extras ou reavaliar a estrutura de turnos. Invista em treinamento para aumentar a eficiência.",
+                "folha de pagamento": "Analise a produtividade da equipe e a estrutura de cargos. Considere otimizar processos para reduzir a necessidade de horas extras ou reavaliar a estrutura de turnos. Invista em treinamento para aumentar a eficiência.",
+                "impostos": "Consulte um contador para verificar se o enquadramento tributário da sua empresa é o mais vantajoso e se há incentivos fiscais aplicáveis ao seu negócio.",
+                "transporte": "Otimize rotas de entrega/coleta, negocie com transportadoras ou considere alternativas logísticas para reduzir custos de transporte."
+            };
+
+            const sugestoesReceitaPorSetor = {
+                "restaurante": [
+                    "Crie promoções para dias/horários de menor movimento (happy hour, almoço executivo).",
+                    "Invista em marketing digital focado na sua região (Instagram, Google Meu Negócio, anúncios locais).",
+                    "Otimize seu cardápio, destacando pratos mais rentáveis e removendo os de baixa saída/lucratividade.",
+                    "Considere oferecer serviços de delivery ou take-away com eficiência.",
+                    "Desenvolva um programa de fidelidade ou promoções para clientes recorrentes."
+                ],
+                "pizzaria": [
+                    "Crie combos promocionais (pizza + refrigerante, duas pizzas por um preço especial).",
+                    "Invista em anúncios online geolocalizados e explore parcerias com condomínios ou empresas locais.",
+                    "Otimize seu sistema de delivery para agilidade, qualidade na entrega e boa apresentação.",
+                    "Ofereça sabores diferenciados, opções vegetarianas/veganas ou promoções temáticas semanais.",
+                    "Utilize as redes sociais para mostrar a qualidade dos seus produtos e interagir com os clientes."
+                ],
+                "loja de roupas": [
+                    "Melhore a experiência visual da loja (vitrine atraente, organização interna, provadores confortáveis).",
+                    "Utilize as redes sociais (Instagram, TikTok, Pinterest) para mostrar novidades, looks e criar desejo.",
+                    "Crie promoções sazonais, liquidações estratégicas ou um clube de descontos para clientes VIP.",
+                    "Invista em um excelente atendimento personalizado para fidelizar clientes e aumentar o ticket médio.",
+                    "Considere vender online através de um e-commerce próprio ou marketplaces."
+                ],
+                "consultoria": [
+                    "Construa autoridade no seu nicho através da criação de conteúdo de valor (blog, LinkedIn, vídeos, webinars).",
+                    "Peça e divulgue depoimentos de clientes satisfeitos para gerar prova social.",
+                    "Desenvolva parcerias estratégicas com outros profissionais ou empresas que atendam o mesmo público-alvo.",
+                    "Ofereça diferentes pacotes de serviços ou consultorias iniciais com valor atrativo para captar novos clientes.",
+                    "Participe de eventos e grupos do seu setor para networking e prospecção."
+                ],
+                "default": [ 
+                    "Invista em marketing digital direcionado ao seu público-alvo (redes sociais, Google Ads, SEO local).",
+                    "Crie um programa de indicação onde clientes atuais ganham benefícios ao trazer novos clientes.",
+                    "Busque parcerias estratégicas com negócios complementares para alcançar novos públicos.",
+                    "Melhore a experiência do cliente em todos os pontos de contato para incentivar a fidelização e o boca a boca positivo.",
+                    "Analise a possibilidade de expandir sua oferta de produtos/serviços ou criar versões premium.",
+                    "Realize pesquisas de satisfação para entender melhor as necessidades dos seus clientes e identificar oportunidades."
+                ]
+            };
 
 
             function formatarMoeda(valor) {
@@ -538,7 +598,10 @@
                 document.getElementById('metaFaturamentoDiario').textContent = formatarMoeda(0);
                 document.getElementById('resultadoROI').textContent = '--';
                 document.getElementById('textoAvaliacao').textContent = '-';
-                // Removida limpeza da pontuação, pois o elemento foi removido do HTML
+                document.getElementById('classificacaoViabilidade').textContent = 'Classificação: -'; // Resetar classificação
+                document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent';
+                document.getElementById('textoAvaliacao').style.color = '#212529';
+
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
@@ -592,7 +655,7 @@
                 });
 
                 let totalDespesas = 0;
-                const despesasListaParaResultado = [];
+                const despesasListaParaResultado = []; // Será populado com { descricao, valor }
                 listaDespesasDiv.querySelectorAll('.item-group').forEach(item => {
                     const descricaoInput = item.querySelector('.despesaDescricao');
                     const valorInput = item.querySelector('.despesaValor');
@@ -700,81 +763,105 @@
 
                 document.getElementById('resultadoROI').textContent = tempoRetornoROI;
 
-                // --- Lógica de Avaliação Textual (sem pontuação numérica) ---
-                let classificacaoViabilidade = "";
+                // --- Lógica de Avaliação Textual ---
+                let classificacaoViabilidadeTexto = "";
                 let textoAvaliacaoFinal = "";
                 let corFundoAvaliacao = "transparent";
-                let corTextoAvaliacao = "#212529"; // Cor padrão do texto
+                let corTextoAvaliacao = "#212529"; 
+                const classificacaoViabilidadeEl = document.getElementById('classificacaoViabilidade');
+
 
                 if (lucroMensal <= 0) {
-                    classificacaoViabilidade = "🔴 NEGÓCIO INVIÁVEL";
+                    classificacaoViabilidadeTexto = "🔴 NEGÓCIO INVIÁVEL";
                     corFundoAvaliacao = '#f8d7da'; corTextoAvaliacao = '#721c24';
-                    textoAvaliacaoFinal += `${classificacaoViabilidade}\n`;
-                    textoAvaliacaoFinal += `   Com prejuízo ou lucro zero (${formatarMoeda(lucroMensal)}), o negócio não é sustentável no cenário atual.\n\n`;
+                    textoAvaliacaoFinal += `Com prejuízo ou lucro zero (${formatarMoeda(lucroMensal)}), o negócio não é sustentável no cenário atual.\n\n`;
                     textoAvaliacaoFinal += `Ações Críticas Necessárias:\n`;
                     textoAvaliacaoFinal += `- É imprescindível aumentar o faturamento e/ou reduzir drasticamente as despesas.\n`;
                     textoAvaliacaoFinal += `- Reavalie fundamentalmente o modelo de negócio, precificação e estrutura de custos.\n`;
                 } else { // Lucro > 0
-                    if (margemEsperadaInformadaValor <= 0) { // Caso a margem esperada seja 0 ou negativa, usar faixas genéricas
+                    if (margemEsperadaInformadaValor <= 0) { 
+                        // Avaliação genérica se margem esperada não for válida
                         if (margemLucroCalculada > 30 && isFinite(margemLucroCalculada)) {
-                            classificacaoViabilidade = "🟢 NEGÓCIO VIÁVEL";
+                            classificacaoViabilidadeTexto = "🟢 NEGÓCIO VIÁVEL";
                             corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
                         } else if (margemLucroCalculada > 10 && isFinite(margemLucroCalculada)) {
-                            classificacaoViabilidade = "🟡 VIABILIDADE MODERADA";
+                            classificacaoViabilidadeTexto = "🟡 VIABILIDADE MODERADA";
                             corFundoAvaliacao = '#fff3cd'; corTextoAvaliacao = '#856404';
                         } else {
-                            classificacaoViabilidade = "🔴 NEGÓCIO INVIÁVEL (Margem muito baixa)";
+                            classificacaoViabilidadeTexto = "🔴 NEGÓCIO INVIÁVEL (Margem muito baixa)";
                              corFundoAvaliacao = '#f8d7da'; corTextoAvaliacao = '#721c24';
                         }
-                        textoAvaliacaoFinal += `${classificacaoViabilidade}\n   Análise baseada em faixas genéricas de margem de lucro, pois a margem esperada informada é inválida.\n`;
+                        textoAvaliacaoFinal += `Análise baseada em faixas genéricas de margem de lucro, pois a margem esperada informada (${formatarPercentagem(margemEsperadaInformadaValor)}) é inválida ou não fornecida adequadamente.\n`;
                     } else if (isFinite(margemLucroCalculada)) {
                         const proporcaoMargem = (margemLucroCalculada / margemEsperadaInformadaValor) * 100;
 
                         if (proporcaoMargem >= 80) {
-                            classificacaoViabilidade = "🟢 NEGÓCIO VIÁVEL";
+                            classificacaoViabilidadeTexto = "🟢 NEGÓCIO VIÁVEL";
                             corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
                         } else if (proporcaoMargem >= 50) {
-                            classificacaoViabilidade = "🟡 VIABILIDADE MODERADA";
+                            classificacaoViabilidadeTexto = "🟡 VIABILIDADE MODERADA";
                             corFundoAvaliacao = '#fff3cd'; corTextoAvaliacao = '#856404';
                         } else {
-                            classificacaoViabilidade = "🔴 NEGÓCIO INVIÁVEL";
+                            classificacaoViabilidadeTexto = "🔴 NEGÓCIO INVIÁVEL";
                             corFundoAvaliacao = '#f8d7da'; corTextoAvaliacao = '#721c24';
                         }
-                        textoAvaliacaoFinal += `${classificacaoViabilidade}\n`;
-                        textoAvaliacaoFinal += `   Sua margem de lucro calculada (${formatarPercentagem(margemLucroCalculada)}) representa ${formatarPercentagem(proporcaoMargem, false)} da margem esperada informada (${formatarPercentagem(margemEsperadaInformadaValor)}).\n\n`;
+                        textoAvaliacaoFinal += `Sua margem de lucro calculada (${formatarPercentagem(margemLucroCalculada)}) representa ${formatarPercentagem(proporcaoMargem, false)} da margem esperada informada (${formatarPercentagem(margemEsperadaInformadaValor)}).\n\n`;
                     
-                    } else if (margemLucroCalculada === Infinity) { // Lucro com faturamento zero
-                        classificacaoViabilidade = "🟢 NEGÓCIO VIÁVEL (Rentabilidade Teórica Alta)";
+                    } else if (margemLucroCalculada === Infinity) { 
+                        classificacaoViabilidadeTexto = "🟢 NEGÓCIO VIÁVEL (Rentabilidade Teórica Alta)";
                         corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
-                        textoAvaliacaoFinal += `${classificacaoViabilidade}\n   O negócio apresenta lucro sem faturamento, o que é uma situação atípica e altamente rentável teoricamente. Verifique os dados inseridos.\n`;
+                        textoAvaliacaoFinal += `O negócio apresenta lucro sem faturamento, o que é uma situação atípica e altamente rentável teoricamente. Verifique os dados inseridos.\n`;
                     }
                     
-                    // Sugestões
-                    if (classificacaoViabilidade.includes("VIÁVEL")) {
-                        textoAvaliacaoFinal += `Sugestões para Manter ou Melhorar:\n`;
-                        textoAvaliacaoFinal += `- Continue monitorando de perto suas despesas e buscando otimizações.\n`;
-                        textoAvaliacaoFinal += `- Analise o ROI (${tempoRetornoROI}). Se estiver adequado, ótimo! Se não, busque formas de acelerá-lo.\n`;
-                        textoAvaliacaoFinal += `- Mantenha o foco em atingir e superar o faturamento diário necessário de ${formatarMoeda(faturamentoDiarioNecessario)}.\n`;
-                    } else if (classificacaoViabilidade.includes("MODERADA")) {
-                        textoAvaliacaoFinal += `Sugestões para Melhoria:\n`;
-                        textoAvaliacaoFinal += `- Identifique os principais fatores que estão impactando sua margem de lucro em comparação com a esperada.\n`;
-                        textoAvaliacaoFinal += `- Revise sua estrutura de custos e estratégia de precificação.\n`;
-                        textoAvaliacaoFinal += `- Desenvolva um plano para aumentar o faturamento ou a eficiência operacional.\n`;
-                    } else { // INVIÁVEL (com lucro, mas margem muito baixa)
-                         textoAvaliacaoFinal += `Ações Recomendadas:\n`;
-                         textoAvaliacaoFinal += `- É crucial entender por que a margem de lucro está tão abaixo do esperado.\n`;
-                         textoAvaliacaoFinal += `- Considere se os preços estão muito baixos, os custos muito altos, ou se a margem esperada informada é realista para este modelo de negócio específico.\n`;
+                    // Sugestões de Despesas
+                    let sugestoesDespesasAdicionadas = false;
+                    despesasListaParaResultado.forEach(despesa => {
+                        // Considera despesa alta se for > 25% do total de despesas E total de despesas for > 50% do faturamento
+                        if (despesa.valor > (totalDespesas * 0.25) && totalDespesas > (faturamentoMensal * 0.40) && faturamentoMensal > 0) {
+                            if (!sugestoesDespesasAdicionadas) {
+                                textoAvaliacaoFinal += `\nPontos de Atenção nas Despesas:\n`;
+                                sugestoesDespesasAdicionadas = true;
+                            }
+                            const descNormalizada = despesa.descricao.toLowerCase();
+                            for (const chave in sugestoesDespesasEspecificas) {
+                                if (descNormalizada.includes(chave)) {
+                                    textoAvaliacaoFinal += `- ${sugestoesDespesasEspecificas[chave]} (Despesa: ${despesa.descricao} - ${formatarMoeda(despesa.valor)})\n`;
+                                    break; 
+                                }
+                            }
+                        }
+                    });
+                    if (sugestoesDespesasAdicionadas) textoAvaliacaoFinal += "\n";
+
+
+                    // Sugestões de Receita
+                    if (classificacaoViabilidadeTexto.includes("MODERADA") || classificacaoViabilidadeTexto.includes("INVIÁVEL")) {
+                        textoAvaliacaoFinal += `Sugestões para Aumentar a Receita (${tipoNegocioValor}):\n`;
+                        const tipoNegocioNorm = tipoNegocioValor.toLowerCase().trim();
+                        const sugestoesReceita = sugestoesReceitaPorSetor[tipoNegocioNorm] || sugestoesReceitaPorSetor["default"];
+                        sugestoesReceita.slice(0, 3).forEach(sugestao => { // Limitar a 3 sugestões
+                            textoAvaliacaoFinal += `- ${sugestao}\n`;
+                        });
+                        textoAvaliacaoFinal += "\n";
+                    } else if (classificacaoViabilidadeTexto.includes("VIÁVEL")){
+                         textoAvaliacaoFinal += `Sugestões para Manter ou Melhorar o Desempenho:\n`;
+                         textoAvaliacaoFinal += `- Continue monitorando de perto suas despesas e buscando otimizações.\n`;
+                         textoAvaliacaoFinal += `- Analise o ROI (${tempoRetornoROI}). Se estiver adequado, ótimo! Se não, busque formas de acelerá-lo.\n`;
+                         textoAvaliacaoFinal += `- Mantenha o foco em atingir e superar o faturamento diário necessário de ${formatarMoeda(faturamentoDiarioNecessario)}.\n\n`;
                     }
                 }
                 
-                const textoAvaliacaoEl = document.getElementById('textoAvaliacao');
-                textoAvaliacaoEl.textContent = textoAvaliacaoFinal;
-                // Aplicar cor de fundo ao parágrafo da avaliação
-                textoAvaliacaoEl.style.backgroundColor = corFundoAvaliacao;
-                textoAvaliacaoEl.style.color = corTextoAvaliacao;
-                textoAvaliacaoEl.style.padding = '10px';
-                textoAvaliacaoEl.style.borderRadius = '5px';
+                classificacaoViabilidadeEl.textContent = `Classificação: ${classificacaoViabilidadeTexto}`;
+                classificacaoViabilidadeEl.style.backgroundColor = corFundoAvaliacao;
+                classificacaoViabilidadeEl.style.color = corTextoAvaliacao;
+                classificacaoViabilidadeEl.style.padding = '10px';
+                classificacaoViabilidadeEl.style.borderRadius = '5px';
+                classificacaoViabilidadeEl.style.textAlign = 'center';
 
+
+                document.getElementById('textoAvaliacao').textContent = textoAvaliacaoFinal;
+                document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent'; // Remover cor de fundo do parágrafo principal
+                document.getElementById('textoAvaliacao').style.color = '#495057'; // Cor padrão do texto para o parágrafo
 
                 resultadosSimulacaoDiv.style.display = 'block';
                 resultadosSimulacaoDiv.scrollIntoView({ behavior: 'smooth' });
@@ -978,7 +1065,12 @@
                 yPos += lineHeight;
                 doc.setFontSize(10);
                 
-                // Removida a pontuação numérica do PDF
+                const classificacaoViabilidadePDF = document.getElementById('classificacaoViabilidade').textContent;
+                doc.setFont(undefined, 'bold');
+                yPos = addText(classificacaoViabilidadePDF, leftMargin, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += lineHeight * 0.5; // Menor espaço após a classificação
+
                 const textoAvaliacaoPDF = document.getElementById('textoAvaliacao').textContent;
                 yPos = addWrappedText(textoAvaliacaoPDF, leftMargin, yPos, contentWidth, lineHeight * 0.9);
                 yPos += lineHeight * 2;
