@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Investimento Avançado</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Estilos CSS para a página */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #212529;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .secao {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        #resultadosSimulacao.secao {
+             border-bottom: none;
+             padding-bottom: 0;
+        }
+
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+
+        h2 {
+            color: #343a40;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: #495057;
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 0; 
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .secao > input[type="text"], 
+        .secao > input[type="number"],
+        .secao > label + input[type="text"], 
+        .secao > label + input[type="number"] { 
+             margin-bottom: 15px;
+        }
+
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            outline: none;
+        }
+
+        .item-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .item-group input[type="text"] {
+            flex-grow: 3;
+        }
+
+        .item-group input[type="number"] {
+            flex-grow: 1;
+        }
+
+        button {
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0px);
+        }
+
+        .adicionar-item-btn {
+            background-color: #28a745;
+            display: inline-block;
+            margin-top: 10px;
+        }
+         .adicionar-item-btn:hover {
+            background-color: #218838;
+        }
+
+        .remover-item-btn {
+            background-color: #dc3545;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            height: auto;
+            line-height: 1.5;
+        }
+        .remover-item-btn:hover {
+            background-color: #c82333;
+        }
+
+        .total-parcial {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #343a40;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #ced4da;
+        }
+
+        .botoes-acao { 
+            display: flex;
+            gap: 15px; 
+            margin-top: 25px;
+        }
+
+        .botao-principal, #limparCamposBtn { 
+            flex-grow: 1; 
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .botao-principal {
+            background-color: #007bff;
+        }
+        .botao-principal:hover {
+            background-color: #0056b3;
+        }
+
+        #limparCamposBtn { 
+            background-color: #ffc107; 
+            color: #212529; 
+        }
+        #limparCamposBtn:hover {
+            background-color: #e0a800;
+        }
+
+
+        #exportarPDFBtn {
+            background-color: #6c757d;
+            display: inline-block;
+            margin-top: 25px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            width: fit-content;
+        }
+        #exportarPDFBtn:hover {
+            background-color: #5a6268;
+        }
+
+
+        #resultadosSimulacao {
+            background-color: #e9ecef;
+            padding: 20px 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        #resultadosSimulacao h2 {
+            color: #007bff;
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 20px;
+        }
+        #resultadosSimulacao h3 {
+            color: #343a40;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+         #resultadosSimulacao h3:first-of-type {
+            margin-top: 0;
+        }
+
+        #resultadosSimulacao p {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #495057;
+        }
+        #resultadosSimulacao p strong {
+            color: #212529;
+        }
+
+        .lista-resultados-itens {
+            list-style: none;
+            padding-left: 0;
+        }
+        .lista-resultados-itens li {
+            background-color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        #metasFaturamento, #avaliacaoMelhorias {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ced4da;
+        }
+        #avaliacaoMelhorias p {
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+        /* Removido: #pontuacaoViabilidade */
+
+
+        @media (max-width: 700px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.3rem;
+            }
+            .item-group {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            .item-group input[type="text"],
+            .item-group input[type="number"],
+            .item-group .remover-item-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .item-group .remover-item-btn {
+                margin-bottom: 0;
+            }
+            .total-parcial {
+                text-align: left;
+            }
+            .botoes-acao {
+                flex-direction: column; 
+            }
+            #exportarPDFBtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📊 Simulador de Investimento Avançado</h1>
+
+        <div class="secao">
+            <h2>Informações do Negócio</h2>
+            <label for="tipoNegocio">Tipo de Negócio:</label>
+            <input type="text" id="tipoNegocio" placeholder="Ex: Loja de Roupas, Restaurante, Consultoria, Pizzaria">
+            
+            <label for="margemLucroEsperadaSetor">Margem de Lucro Média Esperada para este Negócio (%):</label>
+            <input type="number" id="margemLucroEsperadaSetor" placeholder="Ex: 15 (para 15%)" step="0.1">
+        </div>
+
+        <div class="secao">
+            <h2>1. Investimentos Iniciais</h2>
+            <div id="listaInvestimentos">
+                <div class="item-group">
+                    <input type="text" class="investimentoDescricao item-input" placeholder="Descrição do Investimento (Ex: Compra de máquina)">
+                    <input type="number" class="investimentoValor item-input" placeholder="Valor (R$)" step="0.01">
+                </div>
+            </div>
+            <button type="button" id="adicionarInvestimento" class="adicionar-item-btn">+ Adicionar Investimento</button>
+            <div class="total-parcial">Total Parcial Investimentos: <span id="totalParcialInvestimentos">R$ 0,00</span></div>
+        </div>
+
+        <div class="secao">
+            <h2>2. Despesas Mensais</h2>
+            <div id="listaDespesas">
+                <div class="item-group">
+                    <input type="text" class="despesaDescricao item-input" placeholder="Descrição da Despesa (Ex: Aluguel)">
+                    <input type="number" class="despesaValor item-input" placeholder="Valor (R$)" step="0.01">
+                </div>
+            </div>
+            <button type="button" id="adicionarDespesa" class="adicionar-item-btn">+ Adicionar Despesa</button>
+            <div class="total-parcial">Total Parcial Despesas: <span id="totalParcialDespesas">R$ 0,00</span></div>
+        </div>
+
+        <div class="secao">
+            <h2>3. Faturamento Mensal</h2>
+            <label for="faturamentoMensal">Faturamento Mensal Estimado (30 dias):</label>
+            <input type="number" id="faturamentoMensal" placeholder="Ex: 5000.00" step="0.01">
+        </div>
+
+        <div class="botoes-acao">
+            <button type="button" id="calcularSimulacao" class="botao-principal">Calcular Simulação</button>
+            <button type="button" id="limparCamposBtn">Limpar Informações</button>
+        </div>
+
+
+        <div class="secao" id="resultadosSimulacao" style="display: none;">
+            <h2>📈 Resultados da Simulação</h2>
+            <p><strong>Tipo de Negócio:</strong> <span id="resultadoTipoNegocio">-</span></p>
+            <p><strong>Margem de Lucro Média Esperada (Informada):</strong> <span id="resultadoMargemEsperadaInformada">-</span>%</p>
+            
+            <div id="resumoInvestimentos">
+                <h3>Resumo dos Investimentos:</h3>
+                <ul id="listaResultadoInvestimentos" class="lista-resultados-itens"></ul>
+                <p><strong>Valor Total dos Investimentos:</strong> <span id="resultadoInvestimentosTotal">R$ 0,00</span></p>
+            </div>
+            <div id="resumoDespesas">
+                <h3>Resumo das Despesas Mensais:</h3>
+                <ul id="listaResultadoDespesas" class="lista-resultados-itens"></ul>
+                <p><strong>Valor Total das Despesas Mensais:</strong> <span id="resultadoDespesasTotal">R$ 0,00</span></p>
+            </div>
+            <div id="calculoLucro">
+                <h3>Cálculo do Lucro Mensal:</h3>
+                <p>Faturamento Mensal Estimado (30 dias): <span id="resultadoFaturamento">R$ 0,00</span></p>
+                <p>Despesas Mensais Totais: <span id="resultadoDespesasTotalLucro">R$ 0,00</span></p>
+                <p><strong>Lucro Mensal Estimado:</strong> <span id="resultadoLucroMensal">R$ 0,00</span></p>
+                <p><strong>Margem de Lucro Calculada:</strong> <span id="resultadoMargemLucro">--%</span></p>
+            </div>
+            <div id="metasFaturamento">
+                <h3>Metas de Faturamento:</h3>
+                <p>Faturamento Estimado para 30 dias: <span id="metaFaturamento30Dias">R$ 0,00</span></p>
+                <p><strong>Faturamento Diário Necessário:</strong> <span id="metaFaturamentoDiario">R$ 0,00</span></p>
+            </div>
+            <div id="retornoInvestimento">
+                <h3>Retorno Sobre o Investimento (ROI):</h3>
+                <p><strong id="resultadoROI">--</strong></p>
+            </div>
+            <div id="avaliacaoMelhorias">
+                <h3>Avaliação e Sugestões de Melhorias:</h3>
+                <!-- Removido: div#pontuacaoViabilidade -->
+                <p id="textoAvaliacao">-</p>
+            </div>
+            <button type="button" id="exportarPDFBtn">Exportar Relatório para PDF</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const { jsPDF } = window.jspdf;
+
+            const tipoNegocioInput = document.getElementById('tipoNegocio'); 
+            const margemLucroEsperadaSetorInput = document.getElementById('margemLucroEsperadaSetor'); 
+
+            const adicionarInvestimentoBtn = document.getElementById('adicionarInvestimento');
+            const listaInvestimentosDiv = document.getElementById('listaInvestimentos');
+            const totalParcialInvestimentosSpan = document.getElementById('totalParcialInvestimentos');
+
+            const adicionarDespesaBtn = document.getElementById('adicionarDespesa');
+            const listaDespesasDiv = document.getElementById('listaDespesas');
+            const totalParcialDespesasSpan = document.getElementById('totalParcialDespesas');
+
+            const calcularSimulacaoBtn = document.getElementById('calcularSimulacao');
+            const limparCamposBtn = document.getElementById('limparCamposBtn'); 
+            const resultadosSimulacaoDiv = document.getElementById('resultadosSimulacao');
+            const exportarPDFBtn = document.getElementById('exportarPDFBtn');
+            const faturamentoMensalInput = document.getElementById('faturamentoMensal');
+
+
+            function formatarMoeda(valor) {
+                return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+            
+            function formatarPercentagem(valor, mostrarSimbolo = true) {
+                if (isNaN(valor) || !isFinite(valor)) {
+                    return mostrarSimbolo ? '--%' : '--';
+                }
+                return valor.toFixed(2) + (mostrarSimbolo ? '%' : '');
+            }
+
+
+            function atualizarTotalParcial(listaItensDiv, classeValor, spanTotalParcial) {
+                let total = 0;
+                const itens = listaItensDiv.querySelectorAll(`.${classeValor}`);
+                itens.forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+                spanTotalParcial.textContent = formatarMoeda(total);
+            }
+
+            function criarNovoItem(tipo, comBotaoRemover = true) { 
+                const novoItemDiv = document.createElement('div');
+                novoItemDiv.classList.add('item-group');
+                let placeholderDescricao, classeDescricao, classeValor, listaDiv, spanTotalParcial;
+
+                if (tipo === 'investimento') {
+                    placeholderDescricao = "Descrição do Investimento (Ex: Compra de máquina)";
+                    classeDescricao = "investimentoDescricao";
+                    classeValor = "investimentoValor";
+                    listaDiv = listaInvestimentosDiv;
+                    spanTotalParcial = totalParcialInvestimentosSpan;
+                } else {
+                    placeholderDescricao = "Descrição da Despesa";
+                    classeDescricao = "despesaDescricao";
+                    classeValor = "despesaValor";
+                    listaDiv = listaDespesasDiv;
+                    spanTotalParcial = totalParcialDespesasSpan;
+                }
+
+                novoItemDiv.innerHTML = `
+                    <input type="text" class="${classeDescricao} item-input" placeholder="${placeholderDescricao}">
+                    <input type="number" class="${classeValor} item-input" placeholder="Valor (R$)" step="0.01">
+                    ${comBotaoRemover ? '<button type="button" class="remover-item-btn">Remover</button>' : ''}
+                `;
+                const inputValor = novoItemDiv.querySelector(`.${classeValor}`);
+                if(inputValor){ 
+                    inputValor.addEventListener('input', function() {
+                        atualizarTotalParcial(listaDiv, classeValor, spanTotalParcial);
+                    });
+                }
+                return novoItemDiv;
+            }
+
+            adicionarInvestimentoBtn.addEventListener('click', function() {
+                listaInvestimentosDiv.appendChild(criarNovoItem('investimento'));
+                atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
+            });
+
+            adicionarDespesaBtn.addEventListener('click', function() {
+                listaDespesasDiv.appendChild(criarNovoItem('despesa'));
+                atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+            });
+
+            function configurarInteracaoItem(containerDiv, classeValor, spanTotalParcial) {
+                containerDiv.addEventListener('click', function(event) {
+                    if (event.target.classList.contains('remover-item-btn')) {
+                        event.target.parentElement.remove();
+                        atualizarTotalParcial(containerDiv, classeValor, spanTotalParcial);
+                    }
+                });
+                containerDiv.querySelectorAll(`.${classeValor}`).forEach(input => {
+                    input.addEventListener('input', function() {
+                        atualizarTotalParcial(containerDiv, classeValor, spanTotalParcial);
+                    });
+                });
+            }
+
+            configurarInteracaoItem(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
+            configurarInteracaoItem(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+            
+            atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
+            atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+
+            limparCamposBtn.addEventListener('click', function() {
+                tipoNegocioInput.value = '';
+                margemLucroEsperadaSetorInput.value = ''; 
+                faturamentoMensalInput.value = '';
+
+                listaInvestimentosDiv.innerHTML = ''; 
+                listaInvestimentosDiv.appendChild(criarNovoItem('investimento', false)); 
+                atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
+                const primeiroInvestimentoValorInput = listaInvestimentosDiv.querySelector('.investimentoValor');
+                 if(primeiroInvestimentoValorInput){
+                    primeiroInvestimentoValorInput.addEventListener('input', function() {
+                        atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
+                    });
+                }
+
+                listaDespesasDiv.innerHTML = ''; 
+                listaDespesasDiv.appendChild(criarNovoItem('despesa', false)); 
+                atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+                const primeiraDespesaValorInput = listaDespesasDiv.querySelector('.despesaValor');
+                if(primeiraDespesaValorInput){
+                    primeiraDespesaValorInput.addEventListener('input', function() {
+                        atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+                    });
+                }
+
+                resultadosSimulacaoDiv.style.display = 'none';
+                document.getElementById('resultadoTipoNegocio').textContent = '-';
+                document.getElementById('resultadoMargemEsperadaInformada').textContent = '-'; 
+                document.getElementById('listaResultadoInvestimentos').innerHTML = '';
+                document.getElementById('resultadoInvestimentosTotal').textContent = formatarMoeda(0);
+                document.getElementById('listaResultadoDespesas').innerHTML = '';
+                document.getElementById('resultadoDespesasTotal').textContent = formatarMoeda(0);
+                document.getElementById('resultadoFaturamento').textContent = formatarMoeda(0);
+                document.getElementById('resultadoDespesasTotalLucro').textContent = formatarMoeda(0);
+                document.getElementById('resultadoLucroMensal').textContent = formatarMoeda(0);
+                document.getElementById('resultadoMargemLucro').textContent = '--%';
+                document.getElementById('metaFaturamento30Dias').textContent = formatarMoeda(0);
+                document.getElementById('metaFaturamentoDiario').textContent = formatarMoeda(0);
+                document.getElementById('resultadoROI').textContent = '--';
+                document.getElementById('textoAvaliacao').textContent = '-';
+                // Removida limpeza da pontuação, pois o elemento foi removido do HTML
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+
+            calcularSimulacaoBtn.addEventListener('click', function() {
+                const tipoNegocioValor = tipoNegocioInput.value.trim();
+                const margemEsperadaInformadaValor = parseFloat(margemLucroEsperadaSetorInput.value) || 0; 
+                const faturamentoMensalInput = document.getElementById('faturamentoMensal');
+                let algumInvestimentoPreenchido = false;
+                listaInvestimentosDiv.querySelectorAll('.investimentoValor').forEach(item => {
+                    if (item.value.trim() !== '' && parseFloat(item.value) > 0) {
+                        algumInvestimentoPreenchido = true;
+                    }
+                });
+
+                if (tipoNegocioValor === '') {
+                    exibirModalAlerta('Por favor, preencha o Tipo de Negócio.');
+                    return;
+                }
+                if (margemLucroEsperadaSetorInput.value.trim() === '') { 
+                    exibirModalAlerta('Por favor, preencha a Margem de Lucro Média Esperada para este Negócio (%).');
+                    return;
+                }
+                if (!algumInvestimentoPreenchido && faturamentoMensalInput.value.trim() === '') {
+                    exibirModalAlerta('Por favor, preencha pelo menos um Investimento Inicial com valor e o Faturamento Mensal.');
+                    return;
+                }
+                if (!algumInvestimentoPreenchido) {
+                    exibirModalAlerta('Por favor, preencha pelo menos um Investimento Inicial com valor.');
+                    return;
+                }
+                 if (faturamentoMensalInput.value.trim() === '') {
+                    exibirModalAlerta('Por favor, preencha o Faturamento Mensal.');
+                    return;
+                }
+
+                let totalInvestimentos = 0;
+                const investimentosListaParaResultado = [];
+                listaInvestimentosDiv.querySelectorAll('.item-group').forEach(item => {
+                    const descricaoInput = item.querySelector('.investimentoDescricao');
+                    const valorInput = item.querySelector('.investimentoValor');
+                    if (descricaoInput && valorInput) {
+                        const descricao = descricaoInput.value.trim();
+                        const valor = parseFloat(valorInput.value) || 0;
+                        if (valor > 0) {
+                            totalInvestimentos += valor;
+                            investimentosListaParaResultado.push({ descricao: descricao || "Investimento não especificado", valor });
+                        }
+                    }
+                });
+
+                let totalDespesas = 0;
+                const despesasListaParaResultado = [];
+                listaDespesasDiv.querySelectorAll('.item-group').forEach(item => {
+                    const descricaoInput = item.querySelector('.despesaDescricao');
+                    const valorInput = item.querySelector('.despesaValor');
+                    if (descricaoInput && valorInput) {
+                        const descricao = descricaoInput.value.trim();
+                        const valor = parseFloat(valorInput.value) || 0;
+                        if (valor > 0) {
+                            totalDespesas += valor;
+                            despesasListaParaResultado.push({ descricao: descricao || "Despesa não especificada", valor });
+                        }
+                    }
+                });
+
+                const faturamentoMensal = parseFloat(faturamentoMensalInput.value) || 0;
+                const lucroMensal = faturamentoMensal - totalDespesas;
+                let margemLucroCalculada = 0;
+
+                if (faturamentoMensal > 0) {
+                    margemLucroCalculada = (lucroMensal / faturamentoMensal) * 100;
+                } else if (lucroMensal > 0 && faturamentoMensal === 0) {
+                     margemLucroCalculada = Infinity; 
+                } else { 
+                    margemLucroCalculada = 0; 
+                    if (faturamentoMensal > 0 && lucroMensal < 0) {
+                        margemLucroCalculada = (lucroMensal / faturamentoMensal) * 100;
+                    }
+                }
+                
+                const faturamentoDiarioNecessario = faturamentoMensal > 0 ? (faturamentoMensal / 30) : 0;
+
+
+                let tempoRetornoROI = '--';
+                let roiMesesNumerico = Infinity; 
+                if (totalInvestimentos < 0 || faturamentoMensal < 0) {
+                     tempoRetornoROI = 'Valores de investimento ou faturamento não podem ser negativos.';
+                } else if (totalInvestimentos === 0) {
+                    if (lucroMensal > 0) {
+                        tempoRetornoROI = 'Retorno imediato (sem investimento inicial e com lucro).';
+                        roiMesesNumerico = 0;
+                    } else {
+                        tempoRetornoROI = 'Sem investimento inicial e sem lucro ou com prejuízo.';
+                    }
+                } else if (lucroMensal > 0) {
+                    roiMesesNumerico = totalInvestimentos / lucroMensal;
+                    tempoRetornoROI = `Retorno em ${roiMesesNumerico.toFixed(1)} meses.`;
+                } else if (lucroMensal === 0) {
+                    tempoRetornoROI = 'O lucro mensal é zero. O investimento não será recuperado com o cenário atual.';
+                } else {
+                    tempoRetornoROI = 'Prejuízo mensal. O investimento não será recuperado com o cenário atual.';
+                }
+                
+                document.getElementById('resultadoTipoNegocio').textContent = tipoNegocioValor || 'Não informado';
+                document.getElementById('resultadoMargemEsperadaInformada').textContent = formatarPercentagem(margemEsperadaInformadaValor, false);
+
+
+                const listaResultadoInvestimentosUl = document.getElementById('listaResultadoInvestimentos');
+                listaResultadoInvestimentosUl.innerHTML = '';
+                if (investimentosListaParaResultado.length > 0) {
+                    investimentosListaParaResultado.forEach(inv => {
+                        const li = document.createElement('li');
+                        li.textContent = `${inv.descricao}: ${formatarMoeda(inv.valor)}`;
+                        listaResultadoInvestimentosUl.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Nenhum investimento inicial informado.';
+                    listaResultadoInvestimentosUl.appendChild(li);
+                }
+                document.getElementById('resultadoInvestimentosTotal').textContent = formatarMoeda(totalInvestimentos);
+
+                const listaResultadoDespesasUl = document.getElementById('listaResultadoDespesas');
+                listaResultadoDespesasUl.innerHTML = '';
+                if (despesasListaParaResultado.length > 0) {
+                    despesasListaParaResultado.forEach(desp => {
+                        const li = document.createElement('li');
+                        li.textContent = `${desp.descricao}: ${formatarMoeda(desp.valor)}`;
+                        listaResultadoDespesasUl.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Nenhuma despesa detalhada informada.';
+                    listaResultadoDespesasUl.appendChild(li);
+                }
+                document.getElementById('resultadoDespesasTotal').textContent = formatarMoeda(totalDespesas);
+
+                document.getElementById('resultadoFaturamento').textContent = formatarMoeda(faturamentoMensal);
+                document.getElementById('resultadoDespesasTotalLucro').textContent = formatarMoeda(totalDespesas);
+                const resultadoLucroMensalEl = document.getElementById('resultadoLucroMensal');
+                resultadoLucroMensalEl.textContent = formatarMoeda(lucroMensal);
+                resultadoLucroMensalEl.style.color = lucroMensal < 0 ? '#dc3545' : (lucroMensal > 0 ? '#28a745' : '#ffc107');
+                
+                const resultadoMargemLucroEl = document.getElementById('resultadoMargemLucro');
+                resultadoMargemLucroEl.textContent = formatarPercentagem(margemLucroCalculada);
+                 if (margemLucroCalculada < 0) {
+                    resultadoMargemLucroEl.style.color = '#dc3545';
+                } else if (margemLucroCalculada > 0 && isFinite(margemLucroCalculada)) {
+                    resultadoMargemLucroEl.style.color = '#28a745';
+                } else { 
+                    resultadoMargemLucroEl.style.color = '#ffc107';
+                }
+
+                document.getElementById('metaFaturamento30Dias').textContent = formatarMoeda(faturamentoMensal);
+                document.getElementById('metaFaturamentoDiario').textContent = formatarMoeda(faturamentoDiarioNecessario);
+
+
+                document.getElementById('resultadoROI').textContent = tempoRetornoROI;
+
+                // --- Lógica de Avaliação Textual (sem pontuação numérica) ---
+                let classificacaoViabilidade = "";
+                let textoAvaliacaoFinal = "";
+                let corFundoAvaliacao = "transparent";
+                let corTextoAvaliacao = "#212529"; // Cor padrão do texto
+
+                if (lucroMensal <= 0) {
+                    classificacaoViabilidade = "🔴 NEGÓCIO INVIÁVEL";
+                    corFundoAvaliacao = '#f8d7da'; corTextoAvaliacao = '#721c24';
+                    textoAvaliacaoFinal += `${classificacaoViabilidade}\n`;
+                    textoAvaliacaoFinal += `   Com prejuízo ou lucro zero (${formatarMoeda(lucroMensal)}), o negócio não é sustentável no cenário atual.\n\n`;
+                    textoAvaliacaoFinal += `Ações Críticas Necessárias:\n`;
+                    textoAvaliacaoFinal += `- É imprescindível aumentar o faturamento e/ou reduzir drasticamente as despesas.\n`;
+                    textoAvaliacaoFinal += `- Reavalie fundamentalmente o modelo de negócio, precificação e estrutura de custos.\n`;
+                } else { // Lucro > 0
+                    if (margemEsperadaInformadaValor <= 0) { // Caso a margem esperada seja 0 ou negativa, usar faixas genéricas
+                        if (margemLucroCalculada > 30 && isFinite(margemLucroCalculada)) {
+                            classificacaoViabilidade = "🟢 NEGÓCIO VIÁVEL";
+                            corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
+                        } else if (margemLucroCalculada > 10 && isFinite(margemLucroCalculada)) {
+                            classificacaoViabilidade = "🟡 VIABILIDADE MODERADA";
+                            corFundoAvaliacao = '#fff3cd'; corTextoAvaliacao = '#856404';
+                        } else {
+                            classificacaoViabilidade = "🔴 NEGÓCIO INVIÁVEL (Margem muito baixa)";
+                             corFundoAvaliacao = '#f8d7da'; corTextoAvaliacao = '#721c24';
+                        }
+                        textoAvaliacaoFinal += `${classificacaoViabilidade}\n   Análise baseada em faixas genéricas de margem de lucro, pois a margem esperada informada é inválida.\n`;
+                    } else if (isFinite(margemLucroCalculada)) {
+                        const proporcaoMargem = (margemLucroCalculada / margemEsperadaInformadaValor) * 100;
+
+                        if (proporcaoMargem >= 80) {
+                            classificacaoViabilidade = "🟢 NEGÓCIO VIÁVEL";
+                            corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
+                        } else if (proporcaoMargem >= 50) {
+                            classificacaoViabilidade = "🟡 VIABILIDADE MODERADA";
+                            corFundoAvaliacao = '#fff3cd'; corTextoAvaliacao = '#856404';
+                        } else {
+                            classificacaoViabilidade = "🔴 NEGÓCIO INVIÁVEL";
+                            corFundoAvaliacao = '#f8d7da'; corTextoAvaliacao = '#721c24';
+                        }
+                        textoAvaliacaoFinal += `${classificacaoViabilidade}\n`;
+                        textoAvaliacaoFinal += `   Sua margem de lucro calculada (${formatarPercentagem(margemLucroCalculada)}) representa ${formatarPercentagem(proporcaoMargem, false)} da margem esperada informada (${formatarPercentagem(margemEsperadaInformadaValor)}).\n\n`;
+                    
+                    } else if (margemLucroCalculada === Infinity) { // Lucro com faturamento zero
+                        classificacaoViabilidade = "🟢 NEGÓCIO VIÁVEL (Rentabilidade Teórica Alta)";
+                        corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
+                        textoAvaliacaoFinal += `${classificacaoViabilidade}\n   O negócio apresenta lucro sem faturamento, o que é uma situação atípica e altamente rentável teoricamente. Verifique os dados inseridos.\n`;
+                    }
+                    
+                    // Sugestões
+                    if (classificacaoViabilidade.includes("VIÁVEL")) {
+                        textoAvaliacaoFinal += `Sugestões para Manter ou Melhorar:\n`;
+                        textoAvaliacaoFinal += `- Continue monitorando de perto suas despesas e buscando otimizações.\n`;
+                        textoAvaliacaoFinal += `- Analise o ROI (${tempoRetornoROI}). Se estiver adequado, ótimo! Se não, busque formas de acelerá-lo.\n`;
+                        textoAvaliacaoFinal += `- Mantenha o foco em atingir e superar o faturamento diário necessário de ${formatarMoeda(faturamentoDiarioNecessario)}.\n`;
+                    } else if (classificacaoViabilidade.includes("MODERADA")) {
+                        textoAvaliacaoFinal += `Sugestões para Melhoria:\n`;
+                        textoAvaliacaoFinal += `- Identifique os principais fatores que estão impactando sua margem de lucro em comparação com a esperada.\n`;
+                        textoAvaliacaoFinal += `- Revise sua estrutura de custos e estratégia de precificação.\n`;
+                        textoAvaliacaoFinal += `- Desenvolva um plano para aumentar o faturamento ou a eficiência operacional.\n`;
+                    } else { // INVIÁVEL (com lucro, mas margem muito baixa)
+                         textoAvaliacaoFinal += `Ações Recomendadas:\n`;
+                         textoAvaliacaoFinal += `- É crucial entender por que a margem de lucro está tão abaixo do esperado.\n`;
+                         textoAvaliacaoFinal += `- Considere se os preços estão muito baixos, os custos muito altos, ou se a margem esperada informada é realista para este modelo de negócio específico.\n`;
+                    }
+                }
+                
+                const textoAvaliacaoEl = document.getElementById('textoAvaliacao');
+                textoAvaliacaoEl.textContent = textoAvaliacaoFinal;
+                // Aplicar cor de fundo ao parágrafo da avaliação
+                textoAvaliacaoEl.style.backgroundColor = corFundoAvaliacao;
+                textoAvaliacaoEl.style.color = corTextoAvaliacao;
+                textoAvaliacaoEl.style.padding = '10px';
+                textoAvaliacaoEl.style.borderRadius = '5px';
+
+
+                resultadosSimulacaoDiv.style.display = 'block';
+                resultadosSimulacaoDiv.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            function exibirModalAlerta(mensagem) {
+                const modalExistente = document.getElementById('customAlertModal');
+                if (modalExistente) modalExistente.remove();
+                const modal = document.createElement('div');
+                modal.id = 'customAlertModal';
+                Object.assign(modal.style, { position: 'fixed', left: '0', top: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: '1000' });
+                const modalContent = document.createElement('div');
+                Object.assign(modalContent.style, { backgroundColor: '#fff', padding: '30px', borderRadius: '10px', textAlign: 'center', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', maxWidth: '400px', width: '90%' });
+                const modalText = document.createElement('p');
+                modalText.textContent = mensagem;
+                Object.assign(modalText.style, { fontSize: '1.1rem', marginBottom: '20px', color: '#333' });
+                const closeButton = document.createElement('button');
+                closeButton.textContent = 'OK';
+                Object.assign(closeButton.style, { padding: '10px 25px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '1rem' });
+                closeButton.onclick = () => modal.remove();
+                modalContent.append(modalText, closeButton);
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+            }
+
+            exportarPDFBtn.addEventListener('click', function() {
+                if (resultadosSimulacaoDiv.style.display === 'none') {
+                    exibirModalAlerta('Calcule a simulação primeiro para gerar o relatório.');
+                    return;
+                }
+
+                const doc = new jsPDF();
+                let yPos = 20;
+                const lineHeight = 7;
+                const pageHeight = doc.internal.pageSize.height;
+                const leftMargin = 15;
+                const contentWidth = doc.internal.pageSize.width - (leftMargin * 2);
+
+                function addText(text, x, y, options = {}) {
+                    if (y > pageHeight - 20) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text(text, x, y, options);
+                    return y;
+                }
+                
+                function addWrappedText(text, x, y, maxWidth, lineHeight) {
+                    const lines = doc.splitTextToSize(text, maxWidth);
+                    lines.forEach(line => {
+                        y = addText(line, x, y);
+                        y += lineHeight;
+                    });
+                    return y - lineHeight;
+                }
+
+
+                doc.setFontSize(18);
+                yPos = addText('Relatório do Simulador de Investimento', leftMargin, yPos);
+                yPos += lineHeight * 1.5;
+
+                doc.setFontSize(10);
+                const dataAtual = new Date().toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                yPos = addText(`Data da Geração: ${dataAtual}`, leftMargin, yPos);
+                yPos += lineHeight;
+
+                const tipoNegocioPDF = document.getElementById('resultadoTipoNegocio').textContent;
+                yPos = addText(`Tipo de Negócio: ${tipoNegocioPDF}`, leftMargin, yPos);
+                yPos += lineHeight;
+                
+                const margemEsperadaInformadaPDF = document.getElementById('resultadoMargemEsperadaInformada').textContent;
+                yPos = addText(`Margem de Lucro Média Esperada (Informada): ${margemEsperadaInformadaPDF}%`, leftMargin, yPos);
+                yPos += lineHeight * 2;
+
+
+                doc.setLineWidth(0.5);
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+                doc.setFontSize(14);
+                yPos = addText('1. Resumo dos Investimentos', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                const investItems = document.getElementById('listaResultadoInvestimentos').getElementsByTagName('li');
+                if (investItems.length > 0) {
+                    for (let i = 0; i < investItems.length; i++) {
+                        yPos = addWrappedText(`- ${investItems[i].textContent}`, leftMargin + 5, yPos, contentWidth -5, lineHeight);
+                        yPos += lineHeight * 0.5;
+                    }
+                } else {
+                     yPos = addText('- Nenhum investimento inicial informado.', leftMargin + 5, yPos);
+                     yPos += lineHeight * 0.5;
+                }
+                yPos += lineHeight * 0.5;
+                doc.setFont(undefined, 'bold');
+                yPos = addText(document.getElementById('resumoInvestimentos').querySelector('p strong').parentNode.textContent, leftMargin, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += lineHeight * 2;
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+                doc.setFontSize(14);
+                yPos = addText('2. Resumo das Despesas Mensais', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                const despesaItems = document.getElementById('listaResultadoDespesas').getElementsByTagName('li');
+                 if (despesaItems.length > 0) {
+                    for (let i = 0; i < despesaItems.length; i++) {
+                        yPos = addWrappedText(`- ${despesaItems[i].textContent}`, leftMargin + 5, yPos, contentWidth - 5, lineHeight);
+                        yPos += lineHeight * 0.5;
+                    }
+                } else {
+                    yPos = addText('- Nenhuma despesa detalhada informada.', leftMargin + 5, yPos);
+                    yPos += lineHeight * 0.5;
+                }
+                yPos += lineHeight * 0.5;
+                doc.setFont(undefined, 'bold');
+                yPos = addText(document.getElementById('resumoDespesas').querySelector('p strong').parentNode.textContent, leftMargin, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += lineHeight * 2;
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+                doc.setFontSize(14);
+                yPos = addText('3. Cálculo do Lucro Mensal', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                const lucroPs = document.getElementById('calculoLucro').getElementsByTagName('p');
+                for (let i = 0; i < lucroPs.length; i++) {
+                    const textoOriginal = lucroPs[i].textContent;
+                    const strongEl = lucroPs[i].querySelector('strong');
+                    
+                    if (strongEl && strongEl.parentNode === lucroPs[i]) {
+                        const textoAntesStrong = textoOriginal.substring(0, textoOriginal.indexOf(strongEl.textContent));
+                        const textoStrong = strongEl.textContent;
+                        const textoDepoisStrong = textoOriginal.substring(textoOriginal.indexOf(strongEl.textContent) + strongEl.textContent.length);
+
+                        doc.setFont(undefined, 'normal');
+                        doc.text(textoAntesStrong, leftMargin, yPos);
+                        const xStrong = leftMargin + doc.getStringUnitWidth(textoAntesStrong) * doc.getFontSize() / doc.internal.scaleFactor;
+                        
+                        doc.setFont(undefined, 'bold');
+                        
+                        if (lucroPs[i].querySelector('#resultadoLucroMensal')) {
+                            const lucroValorPDF = parseFloat(document.getElementById('resultadoLucroMensal').textContent.replace('R$', '').replace(/\./g, '').replace(',', '.'));
+                            if (lucroValorPDF < 0) doc.setTextColor(220, 53, 69);
+                            else if (lucroValorPDF > 0) doc.setTextColor(40, 167, 69);
+                            else doc.setTextColor(255, 193, 7);
+                        } else if (lucroPs[i].querySelector('#resultadoMargemLucro')) {
+                            const margemValorPDF = parseFloat(document.getElementById('resultadoMargemLucro').textContent.replace('%', '').replace(',', '.'));
+                             if (margemValorPDF < 0) doc.setTextColor(220, 53, 69);
+                            else if (margemValorPDF > 0 && isFinite(margemValorPDF)) doc.setTextColor(40, 167, 69);
+                            else doc.setTextColor(255, 193, 7);
+                        }
+
+                        doc.text(textoStrong, xStrong, yPos);
+                        doc.setTextColor(0, 0, 0);
+                        doc.setFont(undefined, 'normal');
+
+                        const xDepoisStrong = xStrong + doc.getStringUnitWidth(textoStrong) * doc.getFontSize() / doc.internal.scaleFactor;
+                        doc.text(textoDepoisStrong, xDepoisStrong, yPos);
+
+                    } else {
+                         yPos = addText(textoOriginal, leftMargin, yPos);
+                    }
+                    yPos += lineHeight;
+                }
+                yPos += lineHeight;
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+                doc.setFontSize(14);
+                yPos = addText('4. Metas de Faturamento', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                const faturamento30DiasTexto = `Faturamento Estimado para 30 dias: ${document.getElementById('metaFaturamento30Dias').textContent}`;
+                yPos = addText(faturamento30DiasTexto, leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFont(undefined, 'bold');
+                const faturamentoDiarioTexto = `Faturamento Diário Necessário: ${document.getElementById('metaFaturamentoDiario').textContent}`;
+                yPos = addText(faturamentoDiarioTexto, leftMargin, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += lineHeight * 2;
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+
+                doc.setFontSize(14);
+                yPos = addText('5. Retorno Sobre o Investimento (ROI)', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                yPos = addWrappedText(document.getElementById('resultadoROI').textContent, leftMargin, yPos, contentWidth, lineHeight);
+                doc.setFont(undefined, 'normal');
+                yPos += lineHeight * 2;
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+                doc.setFontSize(14);
+                yPos = addText('6. Avaliação e Sugestões de Melhorias', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                
+                // Removida a pontuação numérica do PDF
+                const textoAvaliacaoPDF = document.getElementById('textoAvaliacao').textContent;
+                yPos = addWrappedText(textoAvaliacaoPDF, leftMargin, yPos, contentWidth, lineHeight * 0.9);
+                yPos += lineHeight * 2;
+
+
+                doc.save('Relatorio_Simulador_Investimento.pdf');
+            });
+        });
+    </script>
+
+</body>
+</html>
