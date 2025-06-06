@@ -42,12 +42,22 @@
              padding-bottom: 0;
         }
 
-
         h1 {
             color: #007bff;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 15px; /* Reduzido para acomodar a mensagem abaixo */
             font-size: 2rem;
+        }
+
+        .mensagem-aviso-inicial { /* Novo estilo para a mensagem abaixo do título */
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d; /* Cinza sutil */
+            margin-bottom: 25px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px dashed #ced4da;
         }
 
         h2 {
@@ -258,18 +268,24 @@
             padding-top: 15px;
             border-top: 1px solid #ced4da;
         }
-        #avaliacaoMelhorias p { /* Aplicado ao p#textoAvaliacao */
+        #avaliacaoMelhorias p { 
             white-space: pre-line;
             line-height: 1.7;
             padding: 10px;
             border-radius: 5px;
-            /* Cores de fundo e texto serão definidas via JS */
         }
-         #classificacaoViabilidade { /* Novo estilo para o título da classificação */
+         #classificacaoViabilidade { 
             font-size: 1.3rem;
             font-weight: bold;
             margin-bottom: 10px;
-            /* Cores serão definidas via JS */
+        }
+        .disclaimer-final { /* Novo estilo para o disclaimer */
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ced4da;
+            white-space: pre-line; /* Para respeitar quebras de linha do JS */
         }
 
 
@@ -280,6 +296,9 @@
             }
             h1 {
                 font-size: 1.8rem;
+            }
+            .mensagem-aviso-inicial {
+                font-size: 0.8rem;
             }
             h2 {
                 font-size: 1.3rem;
@@ -314,6 +333,10 @@
 
     <div class="container">
         <h1>📊 Simulador de Investimento Avançado</h1>
+        <!-- Mensagem de Aviso Inicial -->
+        <p class="mensagem-aviso-inicial">
+            <strong>IMPORTANTE:</strong> Quanto mais precisas forem as informações fornecidas, mais próximo da realidade do mercado será o resultado. Pesquise na internet ou consulte pessoas no segmento escolhido para ter melhores informações.
+        </p>
 
         <div class="secao">
             <h2>Informações do Negócio</h2>
@@ -393,8 +416,13 @@
             </div>
             <div id="avaliacaoMelhorias">
                 <h3>Avaliação e Sugestões de Melhorias:</h3>
-                <div id="classificacaoViabilidade">Classificação: -</div> <!-- Campo para classificação textual -->
+                <div id="classificacaoViabilidade">Classificação: -</div>
                 <p id="textoAvaliacao">-</p>
+                <!-- Disclaimer e Contato -->
+                <div class="disclaimer-final">
+                    <p id="disclaimerTexto"></p>
+                    <p id="contatoTexto"></p>
+                </div>
             </div>
             <button type="button" id="exportarPDFBtn">Exportar Relatório para PDF</button>
         </div>
@@ -420,6 +448,13 @@
             const resultadosSimulacaoDiv = document.getElementById('resultadosSimulacao');
             const exportarPDFBtn = document.getElementById('exportarPDFBtn');
             const faturamentoMensalInput = document.getElementById('faturamentoMensal');
+            const disclaimerTextoEl = document.getElementById('disclaimerTexto'); // Elemento para disclaimer
+            const contatoTextoEl = document.getElementById('contatoTexto');     // Elemento para contato
+
+            // Textos para disclaimer e contato
+            const textoDisclaimer = "As informações presentes nesse relatório foram geradas de acordo com o preenchimento das informações. Esse relatório não é uma recomendação de investimento. Antes de fazer qualquer investimento é importante estudar o ramo de negócio escolhido e se possível buscar ajuda de um especialista.";
+            const textoContato = "Se desejar uma consultoria mais detalhada pode procurar o ADM Antônio Carlos nesse WhatsApp (84) 9 9818-6149";
+
 
             const sugestoesDespesasEspecificas = {
                 "aluguel": "Se o aluguel representa uma parcela significativa das suas despesas, considere renegociar o contrato ou procurar um ponto comercial com custo mais baixo, se a localização atual não for absolutamente crucial para o faturamento.",
@@ -598,9 +633,11 @@
                 document.getElementById('metaFaturamentoDiario').textContent = formatarMoeda(0);
                 document.getElementById('resultadoROI').textContent = '--';
                 document.getElementById('textoAvaliacao').textContent = '-';
-                document.getElementById('classificacaoViabilidade').textContent = 'Classificação: -'; // Resetar classificação
+                document.getElementById('classificacaoViabilidade').textContent = 'Classificação: -'; 
                 document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent';
                 document.getElementById('textoAvaliacao').style.color = '#212529';
+                disclaimerTextoEl.textContent = ''; // Limpar disclaimer
+                contatoTextoEl.textContent = '';   // Limpar contato
 
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -655,7 +692,7 @@
                 });
 
                 let totalDespesas = 0;
-                const despesasListaParaResultado = []; // Será populado com { descricao, valor }
+                const despesasListaParaResultado = []; 
                 listaDespesasDiv.querySelectorAll('.item-group').forEach(item => {
                     const descricaoInput = item.querySelector('.despesaDescricao');
                     const valorInput = item.querySelector('.despesaValor');
@@ -763,7 +800,6 @@
 
                 document.getElementById('resultadoROI').textContent = tempoRetornoROI;
 
-                // --- Lógica de Avaliação Textual ---
                 let classificacaoViabilidadeTexto = "";
                 let textoAvaliacaoFinal = "";
                 let corFundoAvaliacao = "transparent";
@@ -778,9 +814,8 @@
                     textoAvaliacaoFinal += `Ações Críticas Necessárias:\n`;
                     textoAvaliacaoFinal += `- É imprescindível aumentar o faturamento e/ou reduzir drasticamente as despesas.\n`;
                     textoAvaliacaoFinal += `- Reavalie fundamentalmente o modelo de negócio, precificação e estrutura de custos.\n`;
-                } else { // Lucro > 0
+                } else { 
                     if (margemEsperadaInformadaValor <= 0) { 
-                        // Avaliação genérica se margem esperada não for válida
                         if (margemLucroCalculada > 30 && isFinite(margemLucroCalculada)) {
                             classificacaoViabilidadeTexto = "🟢 NEGÓCIO VIÁVEL";
                             corFundoAvaliacao = '#d4edda'; corTextoAvaliacao = '#155724';
@@ -813,10 +848,8 @@
                         textoAvaliacaoFinal += `O negócio apresenta lucro sem faturamento, o que é uma situação atípica e altamente rentável teoricamente. Verifique os dados inseridos.\n`;
                     }
                     
-                    // Sugestões de Despesas
                     let sugestoesDespesasAdicionadas = false;
                     despesasListaParaResultado.forEach(despesa => {
-                        // Considera despesa alta se for > 25% do total de despesas E total de despesas for > 50% do faturamento
                         if (despesa.valor > (totalDespesas * 0.25) && totalDespesas > (faturamentoMensal * 0.40) && faturamentoMensal > 0) {
                             if (!sugestoesDespesasAdicionadas) {
                                 textoAvaliacaoFinal += `\nPontos de Atenção nas Despesas:\n`;
@@ -833,13 +866,11 @@
                     });
                     if (sugestoesDespesasAdicionadas) textoAvaliacaoFinal += "\n";
 
-
-                    // Sugestões de Receita
                     if (classificacaoViabilidadeTexto.includes("MODERADA") || classificacaoViabilidadeTexto.includes("INVIÁVEL")) {
                         textoAvaliacaoFinal += `Sugestões para Aumentar a Receita (${tipoNegocioValor}):\n`;
                         const tipoNegocioNorm = tipoNegocioValor.toLowerCase().trim();
                         const sugestoesReceita = sugestoesReceitaPorSetor[tipoNegocioNorm] || sugestoesReceitaPorSetor["default"];
-                        sugestoesReceita.slice(0, 3).forEach(sugestao => { // Limitar a 3 sugestões
+                        sugestoesReceita.slice(0, 3).forEach(sugestao => { 
                             textoAvaliacaoFinal += `- ${sugestao}\n`;
                         });
                         textoAvaliacaoFinal += "\n";
@@ -860,8 +891,13 @@
 
 
                 document.getElementById('textoAvaliacao').textContent = textoAvaliacaoFinal;
-                document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent'; // Remover cor de fundo do parágrafo principal
-                document.getElementById('textoAvaliacao').style.color = '#495057'; // Cor padrão do texto para o parágrafo
+                document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent'; 
+                document.getElementById('textoAvaliacao').style.color = '#495057'; 
+
+                // Adicionar disclaimer e contato no HTML
+                disclaimerTextoEl.textContent = textoDisclaimer;
+                contatoTextoEl.textContent = textoContato;
+
 
                 resultadosSimulacaoDiv.style.display = 'block';
                 resultadosSimulacaoDiv.scrollIntoView({ behavior: 'smooth' });
@@ -1067,13 +1103,25 @@
                 
                 const classificacaoViabilidadePDF = document.getElementById('classificacaoViabilidade').textContent;
                 doc.setFont(undefined, 'bold');
-                yPos = addText(classificacaoViabilidadePDF, leftMargin, yPos);
+                yPos = addText(classificacaoViabilidadePDF, leftMargin, yPos); // Adicionar classificação
                 doc.setFont(undefined, 'normal');
-                yPos += lineHeight * 0.5; // Menor espaço após a classificação
+                yPos += lineHeight * 0.5; 
 
                 const textoAvaliacaoPDF = document.getElementById('textoAvaliacao').textContent;
                 yPos = addWrappedText(textoAvaliacaoPDF, leftMargin, yPos, contentWidth, lineHeight * 0.9);
+                yPos += lineHeight; // Espaço antes do disclaimer
+
+                // Adicionar Disclaimer e Contato ao PDF
+                doc.setFontSize(8); // Fonte menor para disclaimer
+                doc.setTextColor(100, 100, 100); // Cor cinza para disclaimer
+                
+                yPos = addWrappedText(textoDisclaimer, leftMargin, yPos, contentWidth, lineHeight * 0.8);
+                yPos += lineHeight * 0.5; // Pequeno espaço
+                
+                yPos = addWrappedText(textoContato, leftMargin, yPos, contentWidth, lineHeight * 0.8);
                 yPos += lineHeight * 2;
+
+                doc.setTextColor(0,0,0); // Resetar cor do texto
 
 
                 doc.save('Relatorio_Simulador_Investimento.pdf');
@@ -1082,4 +1130,4 @@
     </script>
 
 </body>
-</html>
+</ht
