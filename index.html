@@ -45,14 +45,14 @@
         h1 {
             color: #007bff;
             text-align: center;
-            margin-bottom: 15px; /* Reduzido para acomodar a mensagem abaixo */
+            margin-bottom: 15px; 
             font-size: 2rem;
         }
 
-        .mensagem-aviso-inicial { /* Novo estilo para a mensagem abaixo do título */
+        .mensagem-aviso-inicial { 
             text-align: center;
             font-size: 0.9rem;
-            color: #6c757d; /* Cinza sutil */
+            color: #6c757d; 
             margin-bottom: 25px;
             padding: 10px;
             background-color: #f8f9fa;
@@ -279,13 +279,13 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        .disclaimer-final { /* Novo estilo para o disclaimer */
+        .disclaimer-final { 
             font-size: 0.85rem;
             color: #6c757d;
             margin-top: 20px;
             padding-top: 15px;
             border-top: 1px dashed #ced4da;
-            white-space: pre-line; /* Para respeitar quebras de linha do JS */
+            white-space: pre-line; 
         }
 
 
@@ -333,7 +333,6 @@
 
     <div class="container">
         <h1>📊 Simulador de Investimento Avançado</h1>
-        <!-- Mensagem de Aviso Inicial -->
         <p class="mensagem-aviso-inicial">
             <strong>IMPORTANTE:</strong> Quanto mais precisas forem as informações fornecidas, mais próximo da realidade do mercado será o resultado. Pesquise na internet ou consulte pessoas no segmento escolhido para ter melhores informações.
         </p>
@@ -360,7 +359,7 @@
         </div>
 
         <div class="secao">
-            <h2>2. Despesas Mensais</h2>
+            <h2>2. Despesas Mensais Fixas</h2>
             <div id="listaDespesas">
                 <div class="item-group">
                     <input type="text" class="despesaDescricao item-input" placeholder="Descrição da Despesa (Ex: Aluguel)">
@@ -368,11 +367,27 @@
                 </div>
             </div>
             <button type="button" id="adicionarDespesa" class="adicionar-item-btn">+ Adicionar Despesa</button>
-            <div class="total-parcial">Total Parcial Despesas: <span id="totalParcialDespesas">R$ 0,00</span></div>
+            <div class="total-parcial">Total Parcial Despesas Fixas: <span id="totalParcialDespesas">R$ 0,00</span></div>
+        </div>
+        
+        <!-- Nova seção para Impostos e Taxas sobre Faturamento -->
+        <div class="secao">
+            <h2>3. Impostos e Taxas sobre Faturamento</h2>
+            <div id="listaTaxas">
+                <div class="item-group">
+                    <input type="text" class="taxaDescricao item-input" placeholder="Imposto (Ex: Simples Nacional)" value="Imposto (Simples Nacional)">
+                    <input type="number" class="taxaValor item-input" placeholder="Valor (%)" step="0.1">
+                </div>
+                <div class="item-group">
+                    <input type="text" class="taxaDescricao item-input" placeholder="Taxas de Cartão" value="Taxas de Cartão">
+                    <input type="number" class="taxaValor item-input" placeholder="Valor (%)" step="0.1">
+                </div>
+            </div>
+            <button type="button" id="adicionarTaxa" class="adicionar-item-btn">+ Adicionar Taxa</button>
         </div>
 
         <div class="secao">
-            <h2>3. Faturamento Mensal</h2>
+            <h2>4. Faturamento Mensal</h2>
             <label for="faturamentoMensal">Faturamento Mensal Estimado (30 dias):</label>
             <input type="number" id="faturamentoMensal" placeholder="Ex: 5000.00" step="0.01">
         </div>
@@ -394,14 +409,19 @@
                 <p><strong>Valor Total dos Investimentos:</strong> <span id="resultadoInvestimentosTotal">R$ 0,00</span></p>
             </div>
             <div id="resumoDespesas">
-                <h3>Resumo das Despesas Mensais:</h3>
+                <h3>Resumo das Despesas Mensais Fixas:</h3>
                 <ul id="listaResultadoDespesas" class="lista-resultados-itens"></ul>
-                <p><strong>Valor Total das Despesas Mensais:</strong> <span id="resultadoDespesasTotal">R$ 0,00</span></p>
+                <p><strong>Valor Total das Despesas Fixas:</strong> <span id="resultadoDespesasTotal">R$ 0,00</span></p>
+            </div>
+             <div id="resumoTaxas"> <!-- Nova seção nos resultados -->
+                <h3>Resumo de Impostos e Taxas sobre Faturamento:</h3>
+                <ul id="listaResultadoTaxas" class="lista-resultados-itens"></ul>
+                <p><strong>Valor Total de Impostos e Taxas:</strong> <span id="resultadoTaxasTotal">R$ 0,00</span></p>
             </div>
             <div id="calculoLucro">
                 <h3>Cálculo do Lucro Mensal:</h3>
                 <p>Faturamento Mensal Estimado (30 dias): <span id="resultadoFaturamento">R$ 0,00</span></p>
-                <p>Despesas Mensais Totais: <span id="resultadoDespesasTotalLucro">R$ 0,00</span></p>
+                <p>Despesas Totais (Fixas + Impostos/Taxas): <span id="resultadoDespesasTotalLucro">R$ 0,00</span></p>
                 <p><strong>Lucro Mensal Estimado:</strong> <span id="resultadoLucroMensal">R$ 0,00</span></p>
                 <p><strong>Margem de Lucro Calculada:</strong> <span id="resultadoMargemLucro">--%</span></p>
             </div>
@@ -418,7 +438,6 @@
                 <h3>Avaliação e Sugestões de Melhorias:</h3>
                 <div id="classificacaoViabilidade">Classificação: -</div>
                 <p id="textoAvaliacao">-</p>
-                <!-- Disclaimer e Contato -->
                 <div class="disclaimer-final">
                     <p id="disclaimerTexto"></p>
                     <p id="contatoTexto"></p>
@@ -443,15 +462,17 @@
             const listaDespesasDiv = document.getElementById('listaDespesas');
             const totalParcialDespesasSpan = document.getElementById('totalParcialDespesas');
 
+            const adicionarTaxaBtn = document.getElementById('adicionarTaxa'); // Novo botão
+            const listaTaxasDiv = document.getElementById('listaTaxas');       // Nova lista
+
             const calcularSimulacaoBtn = document.getElementById('calcularSimulacao');
             const limparCamposBtn = document.getElementById('limparCamposBtn'); 
             const resultadosSimulacaoDiv = document.getElementById('resultadosSimulacao');
             const exportarPDFBtn = document.getElementById('exportarPDFBtn');
             const faturamentoMensalInput = document.getElementById('faturamentoMensal');
-            const disclaimerTextoEl = document.getElementById('disclaimerTexto'); // Elemento para disclaimer
-            const contatoTextoEl = document.getElementById('contatoTexto');     // Elemento para contato
+            const disclaimerTextoEl = document.getElementById('disclaimerTexto'); 
+            const contatoTextoEl = document.getElementById('contatoTexto');     
 
-            // Textos para disclaimer e contato
             const textoDisclaimer = "As informações presentes nesse relatório foram geradas de acordo com o preenchimento das informações. Esse relatório não é uma recomendação de investimento. Antes de fazer qualquer investimento é importante estudar o ramo de negócio escolhido e se possível buscar ajuda de um especialista.";
             const textoContato = "Se desejar uma consultoria mais detalhada pode procurar o ADM Antônio Carlos nesse WhatsApp (84) 9 9818-6149";
 
@@ -470,42 +491,11 @@
             };
 
             const sugestoesReceitaPorSetor = {
-                "restaurante": [
-                    "Crie promoções para dias/horários de menor movimento (happy hour, almoço executivo).",
-                    "Invista em marketing digital focado na sua região (Instagram, Google Meu Negócio, anúncios locais).",
-                    "Otimize seu cardápio, destacando pratos mais rentáveis e removendo os de baixa saída/lucratividade.",
-                    "Considere oferecer serviços de delivery ou take-away com eficiência.",
-                    "Desenvolva um programa de fidelidade ou promoções para clientes recorrentes."
-                ],
-                "pizzaria": [
-                    "Crie combos promocionais (pizza + refrigerante, duas pizzas por um preço especial).",
-                    "Invista em anúncios online geolocalizados e explore parcerias com condomínios ou empresas locais.",
-                    "Otimize seu sistema de delivery para agilidade, qualidade na entrega e boa apresentação.",
-                    "Ofereça sabores diferenciados, opções vegetarianas/veganas ou promoções temáticas semanais.",
-                    "Utilize as redes sociais para mostrar a qualidade dos seus produtos e interagir com os clientes."
-                ],
-                "loja de roupas": [
-                    "Melhore a experiência visual da loja (vitrine atraente, organização interna, provadores confortáveis).",
-                    "Utilize as redes sociais (Instagram, TikTok, Pinterest) para mostrar novidades, looks e criar desejo.",
-                    "Crie promoções sazonais, liquidações estratégicas ou um clube de descontos para clientes VIP.",
-                    "Invista em um excelente atendimento personalizado para fidelizar clientes e aumentar o ticket médio.",
-                    "Considere vender online através de um e-commerce próprio ou marketplaces."
-                ],
-                "consultoria": [
-                    "Construa autoridade no seu nicho através da criação de conteúdo de valor (blog, LinkedIn, vídeos, webinars).",
-                    "Peça e divulgue depoimentos de clientes satisfeitos para gerar prova social.",
-                    "Desenvolva parcerias estratégicas com outros profissionais ou empresas que atendam o mesmo público-alvo.",
-                    "Ofereça diferentes pacotes de serviços ou consultorias iniciais com valor atrativo para captar novos clientes.",
-                    "Participe de eventos e grupos do seu setor para networking e prospecção."
-                ],
-                "default": [ 
-                    "Invista em marketing digital direcionado ao seu público-alvo (redes sociais, Google Ads, SEO local).",
-                    "Crie um programa de indicação onde clientes atuais ganham benefícios ao trazer novos clientes.",
-                    "Busque parcerias estratégicas com negócios complementares para alcançar novos públicos.",
-                    "Melhore a experiência do cliente em todos os pontos de contato para incentivar a fidelização e o boca a boca positivo.",
-                    "Analise a possibilidade de expandir sua oferta de produtos/serviços ou criar versões premium.",
-                    "Realize pesquisas de satisfação para entender melhor as necessidades dos seus clientes e identificar oportunidades."
-                ]
+                "restaurante": ["Crie promoções para dias/horários de menor movimento (happy hour, almoço executivo).", "Invista em marketing digital focado na sua região (Instagram, Google Meu Negócio, anúncios locais).", "Otimize seu cardápio, destacando pratos mais rentáveis."],
+                "pizzaria": ["Crie combos promocionais (pizza + refrigerante).", "Invista em anúncios online geolocalizados e explore parcerias com condomínios.", "Otimize seu sistema de delivery para agilidade e qualidade."],
+                "loja de roupas": ["Melhore a experiência visual da loja (vitrine, organização).", "Utilize redes sociais (Instagram, TikTok) para mostrar novidades e looks.", "Crie promoções sazonais ou um clube de descontos VIP."],
+                "consultoria": ["Construa autoridade no seu nicho com conteúdo de valor (blog, LinkedIn, webinars).", "Peça e divulgue depoimentos de clientes satisfeitos.", "Desenvolva parcerias estratégicas com outros profissionais."],
+                "default": ["Invista em marketing digital direcionado ao seu público-alvo.", "Crie um programa de indicação.", "Busque parcerias estratégicas com negócios complementares."]
             };
 
 
@@ -533,32 +523,50 @@
             function criarNovoItem(tipo, comBotaoRemover = true) { 
                 const novoItemDiv = document.createElement('div');
                 novoItemDiv.classList.add('item-group');
-                let placeholderDescricao, classeDescricao, classeValor, listaDiv, spanTotalParcial;
+                let placeholderDescricao, classeDescricao, classeValor, listaDiv, spanTotalParcial, inputType, step, placeholderValor;
+
+                if (tipo === 'investimento' || tipo === 'despesa') {
+                    inputType = 'number';
+                    placeholderValor = 'Valor (R$)';
+                    step = '0.01';
+                } else { // tipo === 'taxa'
+                    inputType = 'number';
+                    placeholderValor = 'Valor (%)';
+                    step = '0.1';
+                }
 
                 if (tipo === 'investimento') {
-                    placeholderDescricao = "Descrição do Investimento (Ex: Compra de máquina)";
+                    placeholderDescricao = "Descrição do Investimento";
                     classeDescricao = "investimentoDescricao";
                     classeValor = "investimentoValor";
                     listaDiv = listaInvestimentosDiv;
                     spanTotalParcial = totalParcialInvestimentosSpan;
-                } else {
+                } else if (tipo === 'despesa') {
                     placeholderDescricao = "Descrição da Despesa";
                     classeDescricao = "despesaDescricao";
                     classeValor = "despesaValor";
                     listaDiv = listaDespesasDiv;
                     spanTotalParcial = totalParcialDespesasSpan;
+                } else { // tipo === 'taxa'
+                     placeholderDescricao = "Descrição da Taxa";
+                    classeDescricao = "taxaDescricao";
+                    classeValor = "taxaValor";
+                    listaDiv = listaTaxasDiv;
                 }
 
                 novoItemDiv.innerHTML = `
                     <input type="text" class="${classeDescricao} item-input" placeholder="${placeholderDescricao}">
-                    <input type="number" class="${classeValor} item-input" placeholder="Valor (R$)" step="0.01">
+                    <input type="${inputType}" class="${classeValor} item-input" placeholder="${placeholderValor}" step="${step}">
                     ${comBotaoRemover ? '<button type="button" class="remover-item-btn">Remover</button>' : ''}
                 `;
-                const inputValor = novoItemDiv.querySelector(`.${classeValor}`);
-                if(inputValor){ 
-                    inputValor.addEventListener('input', function() {
-                        atualizarTotalParcial(listaDiv, classeValor, spanTotalParcial);
-                    });
+                
+                if (spanTotalParcial) { // Apenas investimentos e despesas têm total parcial
+                    const inputValor = novoItemDiv.querySelector(`.${classeValor}`);
+                    if(inputValor){ 
+                        inputValor.addEventListener('input', function() {
+                            atualizarTotalParcial(listaDiv, classeValor, spanTotalParcial);
+                        });
+                    }
                 }
                 return novoItemDiv;
             }
@@ -573,22 +581,31 @@
                 atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
             });
 
+            adicionarTaxaBtn.addEventListener('click', function() {
+                listaTaxasDiv.appendChild(criarNovoItem('taxa'));
+            });
+
             function configurarInteracaoItem(containerDiv, classeValor, spanTotalParcial) {
                 containerDiv.addEventListener('click', function(event) {
                     if (event.target.classList.contains('remover-item-btn')) {
                         event.target.parentElement.remove();
-                        atualizarTotalParcial(containerDiv, classeValor, spanTotalParcial);
+                         if (spanTotalParcial) {
+                            atualizarTotalParcial(containerDiv, classeValor, spanTotalParcial);
+                        }
                     }
                 });
-                containerDiv.querySelectorAll(`.${classeValor}`).forEach(input => {
-                    input.addEventListener('input', function() {
-                        atualizarTotalParcial(containerDiv, classeValor, spanTotalParcial);
+                 if (spanTotalParcial) {
+                    containerDiv.querySelectorAll(`.${classeValor}`).forEach(input => {
+                        input.addEventListener('input', function() {
+                            atualizarTotalParcial(containerDiv, classeValor, spanTotalParcial);
+                        });
                     });
-                });
+                }
             }
 
             configurarInteracaoItem(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
             configurarInteracaoItem(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+            configurarInteracaoItem(listaTaxasDiv, 'taxaValor', null); // Sem total parcial para taxas
             
             atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
             atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
@@ -601,45 +618,27 @@
                 listaInvestimentosDiv.innerHTML = ''; 
                 listaInvestimentosDiv.appendChild(criarNovoItem('investimento', false)); 
                 atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
-                const primeiroInvestimentoValorInput = listaInvestimentosDiv.querySelector('.investimentoValor');
-                 if(primeiroInvestimentoValorInput){
-                    primeiroInvestimentoValorInput.addEventListener('input', function() {
-                        atualizarTotalParcial(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
-                    });
-                }
+                configurarInteracaoItem(listaInvestimentosDiv, 'investimentoValor', totalParcialInvestimentosSpan);
+
 
                 listaDespesasDiv.innerHTML = ''; 
                 listaDespesasDiv.appendChild(criarNovoItem('despesa', false)); 
                 atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
-                const primeiraDespesaValorInput = listaDespesasDiv.querySelector('.despesaValor');
-                if(primeiraDespesaValorInput){
-                    primeiraDespesaValorInput.addEventListener('input', function() {
-                        atualizarTotalParcial(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
-                    });
-                }
+                configurarInteracaoItem(listaDespesasDiv, 'despesaValor', totalParcialDespesasSpan);
+                
+                listaTaxasDiv.innerHTML = `
+                    <div class="item-group">
+                        <input type="text" class="taxaDescricao item-input" placeholder="Imposto (Ex: Simples Nacional)" value="Imposto (Simples Nacional)">
+                        <input type="number" class="taxaValor item-input" placeholder="Valor (%)" step="0.1">
+                    </div>
+                    <div class="item-group">
+                        <input type="text" class="taxaDescricao item-input" placeholder="Taxas de Cartão" value="Taxas de Cartão">
+                        <input type="number" class="taxaValor item-input" placeholder="Valor (%)" step="0.1">
+                    </div>`;
+
 
                 resultadosSimulacaoDiv.style.display = 'none';
-                document.getElementById('resultadoTipoNegocio').textContent = '-';
-                document.getElementById('resultadoMargemEsperadaInformada').textContent = '-'; 
-                document.getElementById('listaResultadoInvestimentos').innerHTML = '';
-                document.getElementById('resultadoInvestimentosTotal').textContent = formatarMoeda(0);
-                document.getElementById('listaResultadoDespesas').innerHTML = '';
-                document.getElementById('resultadoDespesasTotal').textContent = formatarMoeda(0);
-                document.getElementById('resultadoFaturamento').textContent = formatarMoeda(0);
-                document.getElementById('resultadoDespesasTotalLucro').textContent = formatarMoeda(0);
-                document.getElementById('resultadoLucroMensal').textContent = formatarMoeda(0);
-                document.getElementById('resultadoMargemLucro').textContent = '--%';
-                document.getElementById('metaFaturamento30Dias').textContent = formatarMoeda(0);
-                document.getElementById('metaFaturamentoDiario').textContent = formatarMoeda(0);
-                document.getElementById('resultadoROI').textContent = '--';
-                document.getElementById('textoAvaliacao').textContent = '-';
-                document.getElementById('classificacaoViabilidade').textContent = 'Classificação: -'; 
-                document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent';
-                document.getElementById('textoAvaliacao').style.color = '#212529';
-                disclaimerTextoEl.textContent = ''; // Limpar disclaimer
-                contatoTextoEl.textContent = '';   // Limpar contato
-
-
+                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
@@ -691,7 +690,7 @@
                     }
                 });
 
-                let totalDespesas = 0;
+                let totalDespesasFixas = 0;
                 const despesasListaParaResultado = []; 
                 listaDespesasDiv.querySelectorAll('.item-group').forEach(item => {
                     const descricaoInput = item.querySelector('.despesaDescricao');
@@ -700,14 +699,33 @@
                         const descricao = descricaoInput.value.trim();
                         const valor = parseFloat(valorInput.value) || 0;
                         if (valor > 0) {
-                            totalDespesas += valor;
+                            totalDespesasFixas += valor;
                             despesasListaParaResultado.push({ descricao: descricao || "Despesa não especificada", valor });
                         }
                     }
                 });
-
+                
                 const faturamentoMensal = parseFloat(faturamentoMensalInput.value) || 0;
-                const lucroMensal = faturamentoMensal - totalDespesas;
+
+                // Calcular Impostos e Taxas
+                let totalTaxas = 0;
+                const taxasListaParaResultado = [];
+                listaTaxasDiv.querySelectorAll('.item-group').forEach(item => {
+                    const descricaoInput = item.querySelector('.taxaDescricao');
+                    const valorInput = item.querySelector('.taxaValor');
+                     if (descricaoInput && valorInput) {
+                        const descricao = descricaoInput.value.trim();
+                        const percentual = parseFloat(valorInput.value) || 0;
+                        if (percentual > 0) {
+                            const valorCalculado = (faturamentoMensal * percentual) / 100;
+                            totalTaxas += valorCalculado;
+                            taxasListaParaResultado.push({descricao: descricao || "Taxa não especificada", valor: valorCalculado, percentual: percentual});
+                        }
+                    }
+                });
+                
+                const totalDespesasGeral = totalDespesasFixas + totalTaxas;
+                const lucroMensal = faturamentoMensal - totalDespesasGeral;
                 let margemLucroCalculada = 0;
 
                 if (faturamentoMensal > 0) {
@@ -773,13 +791,30 @@
                     });
                 } else {
                     const li = document.createElement('li');
-                    li.textContent = 'Nenhuma despesa detalhada informada.';
+                    li.textContent = 'Nenhuma despesa fixa informada.';
                     listaResultadoDespesasUl.appendChild(li);
                 }
-                document.getElementById('resultadoDespesasTotal').textContent = formatarMoeda(totalDespesas);
+                document.getElementById('resultadoDespesasTotal').textContent = formatarMoeda(totalDespesasFixas);
+                
+                // Exibir Resumo de Taxas
+                const listaResultadoTaxasUl = document.getElementById('listaResultadoTaxas');
+                listaResultadoTaxasUl.innerHTML = '';
+                 if (taxasListaParaResultado.length > 0) {
+                    taxasListaParaResultado.forEach(taxa => {
+                        const li = document.createElement('li');
+                        li.textContent = `${taxa.descricao} (${formatarPercentagem(taxa.percentual, false)}%): ${formatarMoeda(taxa.valor)}`;
+                        listaResultadoTaxasUl.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Nenhuma taxa sobre faturamento informada.';
+                    listaResultadoTaxasUl.appendChild(li);
+                }
+                document.getElementById('resultadoTaxasTotal').textContent = formatarMoeda(totalTaxas);
+
 
                 document.getElementById('resultadoFaturamento').textContent = formatarMoeda(faturamentoMensal);
-                document.getElementById('resultadoDespesasTotalLucro').textContent = formatarMoeda(totalDespesas);
+                document.getElementById('resultadoDespesasTotalLucro').textContent = formatarMoeda(totalDespesasGeral);
                 const resultadoLucroMensalEl = document.getElementById('resultadoLucroMensal');
                 resultadoLucroMensalEl.textContent = formatarMoeda(lucroMensal);
                 resultadoLucroMensalEl.style.color = lucroMensal < 0 ? '#dc3545' : (lucroMensal > 0 ? '#28a745' : '#ffc107');
@@ -849,8 +884,9 @@
                     }
                     
                     let sugestoesDespesasAdicionadas = false;
-                    despesasListaParaResultado.forEach(despesa => {
-                        if (despesa.valor > (totalDespesas * 0.25) && totalDespesas > (faturamentoMensal * 0.40) && faturamentoMensal > 0) {
+                    const todasAsDespesas = [...despesasListaParaResultado, ...taxasListaParaResultado];
+                    todasAsDespesas.forEach(despesa => {
+                        if (despesa.valor > (totalDespesasGeral * 0.25) && totalDespesasGeral > (faturamentoMensal * 0.40) && faturamentoMensal > 0) {
                             if (!sugestoesDespesasAdicionadas) {
                                 textoAvaliacaoFinal += `\nPontos de Atenção nas Despesas:\n`;
                                 sugestoesDespesasAdicionadas = true;
@@ -894,7 +930,6 @@
                 document.getElementById('textoAvaliacao').style.backgroundColor = 'transparent'; 
                 document.getElementById('textoAvaliacao').style.color = '#495057'; 
 
-                // Adicionar disclaimer e contato no HTML
                 disclaimerTextoEl.textContent = textoDisclaimer;
                 contatoTextoEl.textContent = textoContato;
 
@@ -953,8 +988,7 @@
                     });
                     return y - lineHeight;
                 }
-
-
+                
                 doc.setFontSize(18);
                 yPos = addText('Relatório do Simulador de Investimento', leftMargin, yPos);
                 yPos += lineHeight * 1.5;
@@ -1000,7 +1034,7 @@
                 yPos += lineHeight;
 
                 doc.setFontSize(14);
-                yPos = addText('2. Resumo das Despesas Mensais', leftMargin, yPos);
+                yPos = addText('2. Resumo das Despesas Mensais Fixas', leftMargin, yPos);
                 yPos += lineHeight;
                 doc.setFontSize(10);
                 const despesaItems = document.getElementById('listaResultadoDespesas').getElementsByTagName('li');
@@ -1010,7 +1044,7 @@
                         yPos += lineHeight * 0.5;
                     }
                 } else {
-                    yPos = addText('- Nenhuma despesa detalhada informada.', leftMargin + 5, yPos);
+                    yPos = addText('- Nenhuma despesa fixa informada.', leftMargin + 5, yPos);
                     yPos += lineHeight * 0.5;
                 }
                 yPos += lineHeight * 0.5;
@@ -1022,7 +1056,30 @@
                 yPos += lineHeight;
 
                 doc.setFontSize(14);
-                yPos = addText('3. Cálculo do Lucro Mensal', leftMargin, yPos);
+                yPos = addText('3. Resumo de Impostos e Taxas sobre Faturamento', leftMargin, yPos);
+                yPos += lineHeight;
+                doc.setFontSize(10);
+                const taxaItems = document.getElementById('listaResultadoTaxas').getElementsByTagName('li');
+                 if (taxaItems.length > 0) {
+                    for (let i = 0; i < taxaItems.length; i++) {
+                        yPos = addWrappedText(`- ${taxaItems[i].textContent}`, leftMargin + 5, yPos, contentWidth - 5, lineHeight);
+                        yPos += lineHeight * 0.5;
+                    }
+                } else {
+                    yPos = addText('- Nenhuma taxa sobre faturamento informada.', leftMargin + 5, yPos);
+                    yPos += lineHeight * 0.5;
+                }
+                yPos += lineHeight * 0.5;
+                doc.setFont(undefined, 'bold');
+                yPos = addText(document.getElementById('resumoTaxas').querySelector('p strong').parentNode.textContent, leftMargin, yPos);
+                doc.setFont(undefined, 'normal');
+                yPos += lineHeight * 2;
+                doc.line(leftMargin, yPos, doc.internal.pageSize.width - leftMargin, yPos);
+                yPos += lineHeight;
+
+
+                doc.setFontSize(14);
+                yPos = addText('4. Cálculo do Lucro Mensal', leftMargin, yPos);
                 yPos += lineHeight;
                 doc.setFontSize(10);
                 const lucroPs = document.getElementById('calculoLucro').getElementsByTagName('p');
@@ -1070,7 +1127,7 @@
                 yPos += lineHeight;
 
                 doc.setFontSize(14);
-                yPos = addText('4. Metas de Faturamento', leftMargin, yPos);
+                yPos = addText('5. Metas de Faturamento', leftMargin, yPos);
                 yPos += lineHeight;
                 doc.setFontSize(10);
                 const faturamento30DiasTexto = `Faturamento Estimado para 30 dias: ${document.getElementById('metaFaturamento30Dias').textContent}`;
@@ -1086,7 +1143,7 @@
 
 
                 doc.setFontSize(14);
-                yPos = addText('5. Retorno Sobre o Investimento (ROI)', leftMargin, yPos);
+                yPos = addText('6. Retorno Sobre o Investimento (ROI)', leftMargin, yPos);
                 yPos += lineHeight;
                 doc.setFontSize(10);
                 doc.setFont(undefined, 'bold');
@@ -1097,31 +1154,30 @@
                 yPos += lineHeight;
 
                 doc.setFontSize(14);
-                yPos = addText('6. Avaliação e Sugestões de Melhorias', leftMargin, yPos);
+                yPos = addText('7. Avaliação e Sugestões de Melhorias', leftMargin, yPos);
                 yPos += lineHeight;
                 doc.setFontSize(10);
                 
                 const classificacaoViabilidadePDF = document.getElementById('classificacaoViabilidade').textContent;
                 doc.setFont(undefined, 'bold');
-                yPos = addText(classificacaoViabilidadePDF, leftMargin, yPos); // Adicionar classificação
+                yPos = addText(classificacaoViabilidadePDF, leftMargin, yPos);
                 doc.setFont(undefined, 'normal');
                 yPos += lineHeight * 0.5; 
 
                 const textoAvaliacaoPDF = document.getElementById('textoAvaliacao').textContent;
                 yPos = addWrappedText(textoAvaliacaoPDF, leftMargin, yPos, contentWidth, lineHeight * 0.9);
-                yPos += lineHeight; // Espaço antes do disclaimer
+                yPos += lineHeight; 
 
-                // Adicionar Disclaimer e Contato ao PDF
-                doc.setFontSize(8); // Fonte menor para disclaimer
-                doc.setTextColor(100, 100, 100); // Cor cinza para disclaimer
+                doc.setFontSize(8); 
+                doc.setTextColor(100, 100, 100); 
                 
                 yPos = addWrappedText(textoDisclaimer, leftMargin, yPos, contentWidth, lineHeight * 0.8);
-                yPos += lineHeight * 0.5; // Pequeno espaço
+                yPos += lineHeight * 0.5; 
                 
                 yPos = addWrappedText(textoContato, leftMargin, yPos, contentWidth, lineHeight * 0.8);
                 yPos += lineHeight * 2;
 
-                doc.setTextColor(0,0,0); // Resetar cor do texto
+                doc.setTextColor(0,0,0); 
 
 
                 doc.save('Relatorio_Simulador_Investimento.pdf');
@@ -1130,4 +1186,4 @@
     </script>
 
 </body>
-</ht
+</html>
